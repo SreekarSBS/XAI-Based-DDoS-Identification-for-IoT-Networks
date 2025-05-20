@@ -36,7 +36,7 @@ pip install tensorflow keras shap pandas numpy scikit-learn
 Installation
 
 Clone the Repository:
-git clone https://github.com/yourusername/xai-ddos-detection.git](https://github.com/SreekarSBS/XAI-IDS-IoT.git
+git clone [https://github.com/SreekarSBS/XAI-IDS-IoT.git]
 cd xai-ddos-detection
 
 
