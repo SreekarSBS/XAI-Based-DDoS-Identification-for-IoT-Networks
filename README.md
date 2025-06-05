@@ -1,4 +1,4 @@
-```
+
 # 🔒 XAI-IDS-IoT: Explainable AI-Based DDoS Attack Detection for IoT
 
 A lightweight, explainable Intrusion Detection System designed for IoT and traditional networks. Combines **autoencoders** and **SHAP** for anomaly detection and explainability. Built to perform efficiently on resource-constrained devices.
