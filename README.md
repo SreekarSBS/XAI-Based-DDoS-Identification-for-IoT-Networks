@@ -1,24 +1,39 @@
-# XAI-IDS-IoT
- A lightweight, explainable AI-based DDoS attack detection system for IoT and traditional networks. Utilizes autoencoders and SHAP for anomaly detection and feature influence analysis, achieving high accuracy on the USB-IDS dataset. Ideal for resource-constrained IoT devices. A hybrid Explainable AI-based Intrusion Detection System for IoT Networks. This project implements anomaly detection and DDoS mitigation techniques using interpretable machine learning models such as SHAP and LIME, aiming to enhance transparency, trust, and decision support in IoT cybersecurity systems.
+```
+# 🔒 XAI-IDS-IoT: Explainable AI-Based DDoS Attack Detection for IoT
 
-Explainable AI-Based DDoS Attack Detection for IoT Networks
-Overview
-This repository contains the implementation of an Explainable Artificial Intelligence (XAI)-based method for detecting Distributed Denial of Service (DDoS) attacks in IoT and traditional networks, as described in the paper Explainable AI-Based DDoS Attack Identification Method for IoT Networks (Computers 2023, 12, 32). The system uses a combination of autoencoders for anomaly detection and SHAP (SHapley Additive exPlanations) for identifying influential features, providing high detection accuracy and interpretability. The method is designed to be lightweight, making it suitable for deployment on resource-constrained IoT devices.
-The approach focuses on analyzing network traffic at the network layer (Layer 3) to detect anomalies without inspecting packet payloads, thus preserving user privacy. It identifies DDoS attacks by extracting and analyzing features related to volumetric, TCP state-exhaustion, and application-layer attacks, and maps the most influential features to predefined DDoS attack indicators.
-Features
+A lightweight, explainable Intrusion Detection System designed for IoT and traditional networks. Combines **autoencoders** and **SHAP** for anomaly detection and explainability. Built to perform efficiently on resource-constrained devices.
 
-Anomaly Detection: Uses a lightweight autoencoder model to detect network anomalies based on reconstruction error.
-Explainable AI: Employs SHAP to identify and explain the most influential features contributing to detected anomalies.
-Feature Extraction: Extracts 21 key features (volumetric, TCP state-exhaustion, and application-layer) using CICFlowMeter.
-Threshold-Based Detection: Defines thresholds for each feature to distinguish DDoS attack flows from benign traffic.
-Privacy-Preserving: Analyzes packet headers instead of payloads to ensure user privacy.
-Lightweight Design: Optimized for IoT devices, tested on Raspberry Pi 4 and ASUS ZenBook.
-High Accuracy: Achieves superior detection performance (e.g., 0.98–1.0 accuracy on USB-IDS dataset) compared to state-of-the-art methods like Decision Trees, Random Forests, and Deep Neural Networks.
+---
 
-Dataset
-The model was evaluated using the USB-IDS dataset, which includes 17 labeled CSV files with network traffic data, including benign and DDoS attack flows (e.g., HULK attacks). The dataset uses CICFlowMeter for feature extraction and provides explicit feature explanations.
-Requirements
-To run the code, ensure you have the following installed:
+## 🌐 Overview
+- Based on the research: **"Explainable AI-Based DDoS Attack Identification Method for IoT Networks"** (Computers 2023, 12, 32).
+- Detects DDoS attacks using **autoencoders** for anomaly detection.
+- Applies **SHAP** for interpreting model predictions.
+- Designed to run on low-power devices like Raspberry Pi 4.
+
+---
+
+## 📊 Key Features
+
+| Feature                     | Description                                                                 |
+|----------------------------|-----------------------------------------------------------------------------|
+| 🔢 Anomaly Detection    | Lightweight autoencoder trained on benign traffic.                         |
+| 🔍 Explainable AI        | Uses SHAP to explain feature contributions to detections.                 |
+| 📊 Feature Extraction     | 21 features (volumetric, TCP exhaustion, application-layer) via CICFlowMeter. |
+| 🚼 Privacy Focus         | Analyzes headers (not payloads) to preserve privacy.                      |
+| 🛠️ Optimized Design     | Suitable for IoT, tested on RPi 4 and ZenBook.                           |
+| 🔄 Threshold Detection   | Identifies attacks using reconstruction error and feature thresholds.     |
+
+---
+
+## 📅 Dataset: USB-IDS
+- Contains 17 labeled CSVs with benign and DDoS traffic (e.g., HULK).
+- Extracted using **CICFlowMeter**.
+
+---
+
+## 📄 Requirements
+```
 
 Python 3.8+
 TensorFlow Lite
@@ -27,117 +42,134 @@ SHAP
 Pandas
 NumPy
 Scikit-learn
-CICFlowMeter (for feature extraction from pcap files)
-Hardware: Tested on ASUS ZenBook (Intel Core i7, 16GB RAM) and Raspberry Pi 4 (4GB RAM)
 
-You can install the required Python packages using:
+```
+- 🌀 Feature extraction: CICFlowMeter
+- 🚀 Hardware: ASUS ZenBook / Raspberry Pi 4
+
+Install packages:
+```
+
 pip install tensorflow keras shap pandas numpy scikit-learn
 
-Installation
+````
 
-Clone the Repository:
-git clone [https://github.com/SreekarSBS/XAI-IDS-IoT.git]
+---
+
+## 🚧 Installation
+```bash
+git clone https://github.com/SreekarSBS/XAI-IDS-IoT.git
 cd xai-ddos-detection
+````
 
+1. Install CICFlowMeter.
+2. Place the USB-IDS dataset into the `data/` directory.
+3. Create virtual environment:
 
-Install CICFlowMeter:Download and install CICFlowMeter to extract features from network traffic (pcap files).
-
-Prepare the Dataset:
-
-Download the USB-IDS dataset and place it in the data/ directory.
-Ensure the dataset is in CSV format as generated by CICFlowMeter.
-
-
-Set Up the Environment:Create a virtual environment and install dependencies:
+```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
+```
 
+---
 
+## 🔄 Workflow
 
-Usage
+### 1. 🎨 Feature Extraction
 
-Feature Extraction:
+```bash
+python preprocessing/normalize.py
+```
 
-Use CICFlowMeter to process pcap files and generate CSV files with 84 network traffic features.
-Apply min-max normalization to the extracted features (script provided in preprocessing/normalize.py).
+Use CICFlowMeter to extract and normalize 84 features from `.pcap` files.
 
+### 2. 💪 Train Autoencoder
 
-Train the Autoencoder:
+```bash
+python train_autoencoder.py --data data/benign.csv --output models/autoencoder.h5
+```
 
-Run the training script to train the autoencoder on benign traffic data:python train_autoencoder.py --data data/benign.csv --output models/autoencoder.h5
+* 2 hidden layers (10 and 32 neurons)
+* ReLU + Adam optimizer
+* 40 epochs
 
+### 3. ⚡ Detect Anomalies
 
-The script uses a fully connected autoencoder with 2 hidden layers (10 and 32 neurons), ReLU activation, Adam optimizer (learning rate 0.01), and 40 epochs.
+```bash
+python detect_anomalies.py --model models/autoencoder.h5 --data data/test.csv --output results/anomalies.csv
+```
 
+### 4. 🔬 Explain with SHAP
 
-Detect Anomalies:
+```bash
+python explain_anomalies.py --anomalies results/anomalies.csv --model models/autoencoder.h5 --output results/shap_values.csv
+```
 
-Use the trained model to detect anomalies in test data:python detect_anomalies.py --model models/autoencoder.h5 --data data/test.csv --output results/anomalies.csv
+### 5. 🧠 Map to DDoS Indicators
 
+```bash
+python detect_ddos.py --shap results/shap_values.csv --output results/ddos_detections.csv
+```
 
-Anomalies are identified based on reconstruction error exceeding the mean squared error (MSE) threshold.
+---
 
+## 📁 Project Structure
 
-Explain Anomalies with SHAP:
-
-Generate SHAP explanations for detected anomalies:python explain_anomalies.py --anomalies results/anomalies.csv --model models/autoencoder.h5 --output results/shap_values.csv
-
-
-This script identifies the top influential features for each anomalous instance.
-
-
-Map to DDoS Features:
-
-Map influential features to DDoS-specific features and detect attacks:python detect_ddos.py --shap results/shap_values.csv --output results/ddos_detections.csv
-
-
-Features exceeding predefined thresholds are classified as DDoS attacks.
-
-
-
-Project Structure
+```
 xai-ddos-detection/
-├── data/                    # Dataset (USB-IDS CSV files)
-├── models/                  # Trained autoencoder model
-├── results/                 # Output files (anomalies, SHAP values, DDoS detections)
-├── preprocessing/           # Scripts for feature extraction and normalization
-│   └── normalize.py
-├── train_autoencoder.py     # Script to train the autoencoder
-├── detect_anomalies.py      # Script to detect anomalies
-├── explain_anomalies.py     # Script to generate SHAP explanations
-├── detect_ddos.py           # Script to map features and detect DDoS attacks
-├── requirements.txt         # Python dependencies
-└── README.md                # This file
+├── data/                # USB-IDS dataset
+├── models/              # Trained autoencoder
+├── results/             # Outputs: anomalies, SHAP values, etc.
+├── preprocessing/       # Normalization scripts
+├── train_autoencoder.py
+├── detect_anomalies.py
+├── explain_anomalies.py
+├── detect_ddos.py
+├── requirements.txt
+└── README.md
+```
 
-Results
-The proposed method was evaluated on the USB-IDS dataset for HULK attacks:
+---
 
-Hulk No Defense: 0.98 accuracy
-Hulk Evasive: 1.0 accuracy
-Hulk Reqtimeout: 1.0 accuracy
+## 🌟 Results
 
-These results outperform state-of-the-art methods:
+**USB-IDS (HULK variants):**
 
-Decision Tree: 0.97, 0.06, 0.97
-Random Forest: 0.98, 0.00, 0.98
-Deep Neural Network: 0.67, 0.05, 0.66
+| Attack Type     | Accuracy |
+| --------------- | -------- |
+| Hulk No Defense | 0.98     |
+| Hulk Evasive    | 1.00     |
+| Hulk Reqtimeout | 1.00     |
 
-Key influential features for DDoS detection include:
+**Compared to Baselines:**
 
-Flow packets per second (flow packets/s)
-Backward packets per second (bwd packets/s)
-Maximum backward packet length (bwd packet length max)
-Forward packet length variance (fwd packet length std)
+| Model           | Accuracy |
+| --------------- | -------- |
+| Decision Tree   | 0.97     |
+| Random Forest   | 0.98     |
+| Deep Neural Net | 0.66     |
 
-Future Work
+**Top Influential Features:**
 
-Deploy the system in real-time IoT networks with simulated attacks.
-Enhance the model to handle additional attack types and datasets.
-Optimize for even lower resource usage on IoT devices.
+* Flow packets/s
+* Backward packets/s
+* Max backward packet length
+* Forward packet length std
 
-Citation
-If you use this code in your research, please cite the original paper:
+---
+
+## 📈 Future Work
+
+* Real-time IoT deployment with simulated attacks
+* Multi-attack & multi-dataset support
+* Further resource optimization
+
+---
+
+## 📚 Citation
+
+```
 @article{kalutharage2023explainable,
   title={Explainable AI-Based DDoS Attack Identification Method for IoT Networks},
   author={Kalutharage, Chathuranga Sampath and Liu, Xiaodong and Chrysoulas, Christos and Pitropakis, Nikolaos and Papadopoulos, Pavlos},
@@ -148,8 +180,19 @@ If you use this code in your research, please cite the original paper:
   year={2023},
   publisher={MDPI}
 }
+```
 
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
-Contact
-For questions or contributions, please open an issue or contact the repository maintainers.
+---
+
+## 🚑 Contact
+
+For issues or contributions, [open an issue](https://github.com/SreekarSBS/XAI-IDS-IoT/issues) or contact the maintainers.
+
+---
+
+## ✅ License
+
+Licensed under the **MIT License**. See `LICENSE` for details.
+
+```
+```
